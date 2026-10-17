@@ -3,5 +3,7 @@ name = "Linear3D"
 version = "0.1.0"
 edition = "2024"
 
+default-run = "Linear3D"
+
 [dependencies]
 bevy = "0.20.0"
