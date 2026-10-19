@@ -1,4 +1,4 @@
-use bevy::{image::TextureError::TranscodeError, prelude::*};
+use bevy::prelude::*;
 
 pub fn init_scene(
     mut commands: Commands,
