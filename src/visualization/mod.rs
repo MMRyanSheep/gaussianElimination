@@ -1,10 +1,12 @@
-use crate::state::{Settings, PlaneId};
+use crate::state::{PlaneId, Settings};
+
+pub mod scene;
 
 use bevy::prelude::*;
 
 pub fn spawn_planes(mut commands: Commands) {
     for i in 1..=3 {
-            commands.spawn(PlaneId(i));
+        commands.spawn(PlaneId(i));
     }
 }
 

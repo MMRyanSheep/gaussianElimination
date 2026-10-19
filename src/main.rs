@@ -1,15 +1,14 @@
-mod visualization;
 mod state;
+mod visualization;
 
-use visualization::{print_planes, spawn_planes};
-use state::Settings;
 use bevy::prelude::*;
+use state::Settings;
+use visualization::scene::init_scene;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .init_resource::<Settings>()
-        .add_systems(Startup,(spawn_planes, print_planes).chain())
+        .add_systems(Startup, init_scene)
         .run();
 }
-
