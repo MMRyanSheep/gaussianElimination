@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
 pub fn spawn_axes(
-    commands: &mut  Commands,
+    commands: &mut Commands,
     mesh: &mut Assets<Mesh>,
-    materials: &mut Assets<StandardMaterial>
+    materials: &mut Assets<StandardMaterial>,
 ) {
     let length = 10.0;
     let thickness = 0.04;

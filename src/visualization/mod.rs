@@ -1,6 +1,7 @@
 use crate::state::{PlaneId, Settings};
 
 pub mod axes;
+pub mod plane;
 pub mod scene;
 
 use bevy::prelude::*;
@@ -14,13 +15,13 @@ pub fn setup_scene(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     axes::spawn_axes(&mut commands, &mut mesh, &mut materials);
-
-    commands.spawn((
-        Cube,
-        Mesh3d(mesh.add(Cuboid::new(2.0, 2.0, 2.0))),
-        MeshMaterial3d(materials.add(Color::srgb(1.0, 1.0, 1.0))),
-        Transform::default(),
-    ));
+    plane::spawn_plane(&mut commands, &mut mesh, &mut materials);
+    // commands.spawn((
+    //     Cube,
+    //     Mesh3d(mesh.add(Cuboid::new(2.0, 2.0, 2.0))),
+    //     MeshMaterial3d(materials.add(Color::srgb(1.0, 1.0, 1.0))),
+    //     Transform::default(),
+    // ));
 
     commands.spawn((
         PointLight {
@@ -37,9 +38,8 @@ pub fn setup_scene(
     ));
 }
 
-pub fn box_move(time: Res<Time>, mut query: Query<&mut Transform, With<Cube>>) {
-    for mut transformation in &mut query {
-        transformation.translation.x += 1.0 * time.delta_secs();
-    }
-
-}
+// pub fn box_move(time: Res<Time>, mut query: Query<&mut Transform, With<Cube>>) {
+//     for mut transformation in &mut query {
+//         transformation.translation.x += 1.0 * time.delta_secs();
+//     }
+// }
