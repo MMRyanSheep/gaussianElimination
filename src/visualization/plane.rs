@@ -1,15 +1,17 @@
 use bevy::prelude::*;
 
-pub fn equation_to_transform(a: f32, b: f32, c: f32, d: f32) -> Option<Transform> {
-    let normal = Vec3::new(a, b, c);
+use crate::state::{EquationSet, LinearEquation, PlaneId};
+
+pub fn equation_to_transform(eq: &LinearEquation) -> Option<Transform> {
+    let normal = Vec3::new(eq.a, eq.b, eq.c);
 
     let normal_dot = normal.dot(normal);
 
-    if !normal_dot.is_finite() || normal_dot < 1e-12 || !d.is_finite() {
+    if !normal_dot.is_finite() || normal_dot < 1e-12 || !eq.d.is_finite() {
         return None;
     }
 
-    let position = normal * (d / normal_dot);
+    let position = normal * (eq.d / normal_dot);
 
     let direction = normal.normalize();
     let rotation = Quat::from_rotation_arc(Vec3::Y, direction);
@@ -25,17 +27,31 @@ pub fn spawn_plane(
     commands: &mut Commands,
     mesh: &mut ResMut<Assets<Mesh>>,
     material: &mut ResMut<Assets<StandardMaterial>>,
+    equations: Res<EquationSet>,
 ) {
-    let transform = equation_to_transform(3.0, 2.0, 4.0, 6.0);
-    if let Some(transform) = transform {
+    let colors = [
+        Color::srgba(1.0, 0.0, 1.0, 0.35),
+        Color::srgba(0.0, 0.0, 1.0, 0.35),
+        Color::srgba(0.0, 1.0, 0.0, 0.35),
+    ];
+    let mesh = mesh.add(Plane3d::default().mesh().size(1.0, 1.0));
+    for (id, eq) in equations.equations.iter().enumerate() {
+        let Some(transform) = equation_to_transform(eq) else {
+            continue;
+        };
+        let material = material.add(StandardMaterial {
+            base_color: colors[id],
+            alpha_mode: AlphaMode::Blend,
+            cull_mode: None,
+            double_sided: true,
+            ..default()
+        });
+
         commands.spawn((
-            Mesh3d(mesh.add(Plane3d::default().mesh().size(1.0, 1.0))),
+            Mesh3d(mesh.clone()),
+            MeshMaterial3d(material),
+            PlaneId(id),
             transform,
-            MeshMaterial3d(material.add(StandardMaterial {
-                base_color: Color::srgb(1.0, 1.0, 1.0),
-                cull_mode: None,
-                ..default()
-            })),
         ));
     }
 }

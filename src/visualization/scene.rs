@@ -2,8 +2,8 @@ use bevy::prelude::*;
 
 pub fn init_scene(
     mut commands: Commands,
-    mut mesh: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut mesh: Assets<Mesh>,
+    mut materials: Assets<StandardMaterial>,
 ) {
     commands.spawn((
         Mesh3d(mesh.add(Cuboid::new(1.0, 1.0, 1.0))),

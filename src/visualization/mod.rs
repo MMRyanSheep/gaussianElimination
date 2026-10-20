@@ -1,10 +1,10 @@
-use crate::state::{PlaneId, Settings};
-
 pub mod axes;
 pub mod plane;
 pub mod scene;
 
 use bevy::prelude::*;
+
+use crate::state::EquationSet;
 
 #[derive(Component)]
 pub struct Cube;
@@ -13,9 +13,10 @@ pub fn setup_scene(
     mut commands: Commands,
     mut mesh: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut equations: Res<EquationSet>
 ) {
     axes::spawn_axes(&mut commands, &mut mesh, &mut materials);
-    plane::spawn_plane(&mut commands, &mut mesh, &mut materials);
+    plane::spawn_plane(&mut commands, &mut mesh, &mut materials, equations);
     // commands.spawn((
     //     Cube,
     //     Mesh3d(mesh.add(Cuboid::new(2.0, 2.0, 2.0))),
