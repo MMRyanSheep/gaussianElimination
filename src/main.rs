@@ -8,5 +8,6 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .init_resource::<state::EquationSet>()
         .add_systems(Startup, visualization::setup_scene)
+        .add_systems(Update, visualization::plane::move_plane)
         .run();
 }

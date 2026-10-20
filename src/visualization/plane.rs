@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{input::keyboard::Key, prelude::*};
 
 use crate::state::{EquationSet, LinearEquation, PlaneId};
 
@@ -21,6 +21,29 @@ pub fn equation_to_transform(eq: &LinearEquation) -> Option<Transform> {
         rotation,
         ..default()
     })
+}
+
+pub fn move_plane(
+    mut equations: ResMut<EquationSet>,
+    key: Res<ButtonInput<KeyCode>>,
+    mut query: Query<(&PlaneId, &mut Transform)>,
+) {
+    if !key.just_pressed(KeyCode::Space) {
+        return;
+    }
+    let eq = &mut equations.equations[1];
+
+    eq.d = if eq.d == 3.0 { 5.0 } else { 3.0 };
+    for (id, mut trans) in &mut query {
+        if id.0 != 1 {
+            continue;
+        }
+
+        if let Some(new_trans) = equation_to_transform(eq) {
+            *trans = new_trans;
+            //println!("done");
+        }
+    }
 }
 
 pub fn spawn_plane(

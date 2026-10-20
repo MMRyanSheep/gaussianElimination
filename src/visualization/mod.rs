@@ -6,14 +6,11 @@ use bevy::prelude::*;
 
 use crate::state::EquationSet;
 
-#[derive(Component)]
-pub struct Cube;
-
 pub fn setup_scene(
     mut commands: Commands,
     mut mesh: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut equations: Res<EquationSet>
+    equations: Res<EquationSet>,
 ) {
     axes::spawn_axes(&mut commands, &mut mesh, &mut materials);
     plane::spawn_plane(&mut commands, &mut mesh, &mut materials, equations);
