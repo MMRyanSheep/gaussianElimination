@@ -57,7 +57,7 @@ pub fn spawn_plane(
         Color::srgba(0.0, 0.0, 1.0, 0.35),
         Color::srgba(0.0, 1.0, 0.0, 0.35),
     ];
-    let mesh = mesh.add(Plane3d::default().mesh().size(1.0, 1.0));
+    let mesh = mesh.add(Plane3d::default().mesh().size(10.0, 10.0));
     for (id, eq) in equations.equations.iter().enumerate() {
         let Some(transform) = equation_to_transform(eq) else {
             continue;

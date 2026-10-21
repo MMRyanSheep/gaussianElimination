@@ -7,7 +7,13 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .init_resource::<state::EquationSet>()
-        .add_systems(Startup, visualization::setup_scene)
-        .add_systems(Update, visualization::plane::move_plane)
+        .add_systems(Startup, (visualization::setup_scene))
+        .add_systems(
+            Update,
+            (
+                visualization::plane::move_plane,
+                visualization::camera::camera_control,
+            ),
+        )
         .run();
 }

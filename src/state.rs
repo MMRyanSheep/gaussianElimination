@@ -21,21 +21,21 @@ impl Default for EquationSet {
             equations: [
                 LinearEquation {
                     a: 1.0,
+                    b: 0.0,
+                    c: 0.0,
+                    d: 1.0,
+                },
+                LinearEquation {
+                    a: 0.0,
                     b: 1.0,
+                    c: 0.0,
+                    d: 2.0,
+                },
+                LinearEquation {
+                    a: 0.0,
+                    b: 0.0,
                     c: 1.0,
-                    d: 6.0,
-                },
-                LinearEquation {
-                    a: 1.0,
-                    b: 4.0,
-                    c: 2.0,
-                    d: 7.0,
-                },
-                LinearEquation {
-                    a: 5.0,
-                    b: 1.0,
-                    c: 3.0,
-                    d: 4.0,
+                    d: 3.0,
                 },
             ],
         }
