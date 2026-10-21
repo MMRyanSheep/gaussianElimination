@@ -1,4 +1,4 @@
-use bevy::{input::keyboard::Key, prelude::*};
+use bevy::prelude::*;
 
 use crate::state::{EquationSet, LinearEquation, PlaneId};
 

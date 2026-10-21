@@ -37,9 +37,9 @@ pub fn setup_scene(
     //     Transform::from_xyz(8.0, 7.0, 12.0).looking_at(Vec3::ZERO, Vec3::Y),
     // ));
     let orbit = OrbitCamera {
-        yaw: 0.7,
-        pitch: 0.4,
-        radius: 12.0,
+        yaw: 1.0,
+        pitch: 0.9,
+        radius: 30.0,
         target: Vec3::ZERO,
     };
 
