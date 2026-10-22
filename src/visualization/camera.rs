@@ -15,9 +15,8 @@ pub fn camera_transform_update(transform: &mut Transform, camera: &OrbitCamera) 
     let z = camera.radius * camera.pitch.cos() * camera.yaw.cos();
 
     let offset = Vec3::new(x, y, z);
+    transform.look_at(Vec3::ZERO, Vec3::Y);
     transform.translation = camera.target + offset;
-
-    let _ = transform.looking_at(camera.target, Vec3::Y);
 }
 
 pub fn camera_control(
@@ -43,6 +42,5 @@ pub fn camera_control(
         camera.radius *= (-scroll * 0.1).exp();
         camera.radius = camera.radius.clamp(1.0, 90.0);
         camera_transform_update(&mut transform, &camera);
-
     }
 }

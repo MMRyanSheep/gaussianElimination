@@ -4,6 +4,7 @@ pub mod plane;
 pub mod scene;
 
 use bevy::prelude::*;
+use bevy_panorbit_camera::*;
 use camera::{OrbitCamera, camera_transform_update};
 
 use crate::state::EquationSet;
@@ -29,9 +30,8 @@ pub fn setup_scene(
             intensity: 2_000_000.0,
             ..default()
         },
-        Transform::from_xyz(7.0, 7.0, 7.0),
+        Transform::default(),
     ));
-
     // commands.spawn((
     //     Camera3d::default(),
     //     Transform::from_xyz(8.0, 7.0, 12.0).looking_at(Vec3::ZERO, Vec3::Y),
@@ -46,7 +46,11 @@ pub fn setup_scene(
     let mut camera_trans = Transform::default();
 
     camera_transform_update(&mut camera_trans, &orbit);
-    commands.spawn((orbit, camera_trans, Camera3d::default()));
+    //commands.spawn((orbit, camera_trans, Camera3d::default()));
+    commands.spawn((
+        Transform::from_translation(Vec3::new(0.0, 1.5, 5.0)),
+        PanOrbitCamera::default(),
+    ));
 }
 
 // pub fn box_move(time: Res<Time>, mut query: Query<&mut Transform, With<Cube>>) {

@@ -5,8 +5,6 @@
 //     mut mesh: Assets<Mesh>,
 //     mut materials: Assets<StandardMaterial>,
 // ) {
-    
-
 
 //     commands.spawn((
 //         Mesh3d(mesh.add(Plane3d::default().mesh().size(10.0, 10.0))),
