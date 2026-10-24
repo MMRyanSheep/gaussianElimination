@@ -18,8 +18,8 @@ pub fn equation_to_matrix(eq: &EquationSet) -> [[f64; 3]; 3] {
     return [
         [
             eq.equations[0].a as f64,
-            eq.equations[1].b as f64,
-            eq.equations[2].c as f64,
+            eq.equations[0].b as f64,
+            eq.equations[0].c as f64,
         ],
         [
             eq.equations[1].a as f64,

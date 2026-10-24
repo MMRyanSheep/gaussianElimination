@@ -2,11 +2,14 @@ pub mod axes;
 pub mod camera;
 pub mod plane;
 pub mod scene;
+pub mod solution;
 
 use bevy::prelude::*;
 use bevy_panorbit_camera::*;
 use camera::{OrbitCamera, camera_transform_update};
 
+use crate::math::carmer::solver;
+use crate::math::determinant::{det3, equation_to_matrix};
 use crate::state::EquationSet;
 
 pub fn setup_scene(
@@ -15,6 +18,18 @@ pub fn setup_scene(
     mut materials: ResMut<Assets<StandardMaterial>>,
     equations: Res<EquationSet>,
 ) {
+    //math
+
+    let matrix = equation_to_matrix(&equations);
+    let d = det3(matrix);
+    let rhs = [
+        equations.equations[0].d as f64,
+        equations.equations[1].d as f64,
+        equations.equations[2].d as f64,
+    ];
+    let result = solver(matrix, rhs, d);
+    solution::spawn_solution(&mut commands, &mut mesh, &mut materials, result);
+
     axes::spawn_axes(&mut commands, &mut mesh, &mut materials);
     plane::spawn_plane(&mut commands, &mut mesh, &mut materials, equations);
     // commands.spawn((
