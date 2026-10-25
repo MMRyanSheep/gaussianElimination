@@ -1,6 +1,9 @@
+use std::result;
+
 use bevy::prelude::*;
 
 use crate::math::carmer::CramerSolution;
+use crate::state::CalculationState;
 
 #[derive(Component)]
 pub struct SolutionMarker;
@@ -21,4 +24,20 @@ pub fn spawn_solution(
         Transform::from_xyz(result.x as f32, result.y as f32, result.z as f32),
         SolutionMarker,
     ));
+}
+
+pub fn update_solution_marker(
+    commands: Commands,
+    solution: Res<CalculationState>,
+    mut query: Query<&mut Transform, With<SolutionMarker>>,
+) {
+    for mut transform in &mut query {
+        match &solution.result {
+            Some(result) => {
+                transform.translation =
+                    Vec3::new(result.x as f32, result.y as f32, result.z as f32);
+            }
+            None => {}
+        }
+    }
 }

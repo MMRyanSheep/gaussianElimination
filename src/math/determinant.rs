@@ -1,4 +1,4 @@
-use crate::state::EquationSet;
+use crate::state::{AppliedEquation, EquationSet};
 use bevy::prelude::*;
 
 pub fn det3(m: [[f64; 3]; 3]) -> f64 {
@@ -14,7 +14,7 @@ pub fn det3(m: [[f64; 3]; 3]) -> f64 {
     return result_a + result_b + result_c - result_d - result_e - result_f;
 }
 
-pub fn equation_to_matrix(eq: &EquationSet) -> [[f64; 3]; 3] {
+pub fn equation_to_matrix(eq: &AppliedEquation) -> [[f64; 3]; 3] {
     return [
         [
             eq.equations[0].a as f64,
@@ -34,9 +34,9 @@ pub fn equation_to_matrix(eq: &EquationSet) -> [[f64; 3]; 3] {
     ];
 }
 
-pub fn test(eq: Res<EquationSet>) {
-    let mat = equation_to_matrix(&eq);
-    let d = det3(mat);
+// pub fn test(eq: Res<EquationSet>) {
+//     let mat = equation_to_matrix(&eq);
+//     let d = det3(mat);
 
-    println!("determinant {}", d);
-}
+//     println!("determinant {}", d);
+// }

@@ -1,7 +1,22 @@
 use bevy::prelude::*;
+
+use crate::math::{
+    carmer::{CramerSolution, solver},
+    determinant::{det3, equation_to_matrix},
+};
 #[derive(Component)]
 pub struct PlaneId(pub usize);
 
+#[derive(Resource, Default)]
+pub struct CalculationState {
+    pub result: Option<CramerSolution>,
+    pub message: Option<String>,
+}
+
+#[derive(Resource, Default)]
+pub struct StepState {
+    pub current: usize,
+}
 #[derive(Debug, Component, Clone, Copy)]
 pub struct LinearEquation {
     pub a: f32,
@@ -100,4 +115,26 @@ impl Default for EquationSet {
             ],
         }
     }
+}
+
+pub fn update_result(
+    applied: Res<AppliedEquation>,
+    mut calculation: ResMut<CalculationState>,
+    mut steps: ResMut<StepState>,
+) {
+    if !applied.is_changed() {
+        return;
+    }
+    calculation.result = None;
+    calculation.message = None;
+    steps.current = 0;
+    let matrix = equation_to_matrix(&applied);
+    let d = det3(matrix);
+    let rhs = [
+        applied.equations[0].d as f64,
+        applied.equations[1].d as f64,
+        applied.equations[2].d as f64,
+    ];
+    let result = solver(matrix, rhs, d);
+    calculation.result = Some(result);
 }

@@ -10,16 +10,15 @@ use camera::{OrbitCamera, camera_transform_update};
 
 use crate::math::carmer::solver;
 use crate::math::determinant::{det3, equation_to_matrix};
-use crate::state::EquationSet;
+use crate::state::{AppliedEquation, EquationSet};
 
 pub fn setup_scene(
     mut commands: Commands,
     mut mesh: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    equations: Res<EquationSet>,
+    equations: Res<AppliedEquation>,
 ) {
     //math
-
     let matrix = equation_to_matrix(&equations);
     let d = det3(matrix);
     let rhs = [

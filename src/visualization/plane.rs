@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::state::{EquationSet, LinearEquation, PlaneId};
+use crate::state::{AppliedEquation, EquationSet, LinearEquation, PlaneId};
 
 pub fn equation_to_transform(eq: &LinearEquation) -> Option<Transform> {
     let normal = Vec3::new(eq.a, eq.b, eq.c);
@@ -45,12 +45,29 @@ pub fn move_plane(
         }
     }
 }
+pub fn update_plane(
+    mut commands: Commands,
+    equations: Res<AppliedEquation>,
+    mut plane: Query<(&PlaneId, &mut Transform)>,
+) {
+    if !equations.is_changed() {
+        return;
+    }
+    for (id, mut transform) in &mut plane {
+        let equation = equations.equations[id.0];
+
+        match equation_to_transform(&equation) {
+            Some(new_transform) => *transform = new_transform,
+            None => {}
+        }
+    }
+}
 
 pub fn spawn_plane(
     commands: &mut Commands,
     mesh: &mut ResMut<Assets<Mesh>>,
     material: &mut ResMut<Assets<StandardMaterial>>,
-    equations: Res<EquationSet>,
+    equations: Res<AppliedEquation>,
 ) {
     let colors = [
         Color::srgba(1.0, 0.0, 1.0, 0.35),

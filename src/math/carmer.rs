@@ -1,4 +1,7 @@
-use crate::math::determinant::det3;
+use crate::{
+    math::determinant::det3,
+    state::{AppliedEquation, CalculationState, StepState},
+};
 
 #[derive(Debug, Clone, Copy)]
 pub struct CramerSolution {
