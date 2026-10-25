@@ -13,13 +13,11 @@ pub fn spawn_solution(
 ) {
     commands.spawn((
         Mesh3d(mesh.add(Sphere::new(0.15))),
-        MeshMaterial3d(materials.add(
-            (StandardMaterial {
-                base_color: Color::srgb(1.0, 0.85, 0.15),
-                unlit: true,
-                ..default()
-            }),
-        )),
+        MeshMaterial3d(materials.add(StandardMaterial {
+            base_color: Color::srgb(1.0, 0.85, 0.15),
+            unlit: true,
+            ..default()
+        })),
         Transform::from_xyz(result.x as f32, result.y as f32, result.z as f32),
         SolutionMarker,
     ));

@@ -1,5 +1,3 @@
-use bevy::ecs::resource::Resource;
-
 use crate::math::determinant::det3;
 
 #[derive(Debug, Clone, Copy)]
