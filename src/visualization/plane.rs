@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use super::scene::{ActiveScene, SceneContent};
 use crate::state::{AppliedEquation, EquationSet, LinearEquation, PlaneId};
 
 pub fn equation_to_transform(eq: &LinearEquation) -> Option<Transform> {
@@ -70,9 +71,9 @@ pub fn spawn_plane(
     equations: Res<AppliedEquation>,
 ) {
     let colors = [
-        Color::srgba(1.0, 0.0, 1.0, 0.35),
-        Color::srgba(0.0, 0.0, 1.0, 0.35),
-        Color::srgba(0.0, 1.0, 0.0, 0.35),
+        Color::srgba(1.0, 0.48, 0.42, 0.32),
+        Color::srgba(0.36, 0.60, 1.0, 0.32),
+        Color::srgba(0.24, 0.86, 0.72, 0.32),
     ];
     let mesh = mesh.add(Plane3d::default().mesh().size(10.0, 10.0));
     for (id, eq) in equations.equations.iter().enumerate() {
@@ -84,6 +85,8 @@ pub fn spawn_plane(
             alpha_mode: AlphaMode::Blend,
             cull_mode: None,
             double_sided: true,
+            perceptual_roughness: 0.68,
+            reflectance: 0.22,
             ..default()
         });
 
@@ -91,6 +94,7 @@ pub fn spawn_plane(
             Mesh3d(mesh.clone()),
             MeshMaterial3d(material),
             PlaneId(id),
+            SceneContent(ActiveScene::Plane),
             transform,
         ));
     }

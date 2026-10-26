@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use super::scene::{ActiveScene, SceneContent};
 use crate::math::carmer::CramerSolution;
 use crate::state::CalculationState;
 
@@ -15,12 +16,15 @@ pub fn spawn_solution(
     commands.spawn((
         Mesh3d(mesh.add(Sphere::new(0.15))),
         MeshMaterial3d(materials.add(StandardMaterial {
-            base_color: Color::srgb(1.0, 0.85, 0.15),
-            unlit: true,
+            base_color: Color::srgb(1.0, 0.78, 0.28),
+            emissive: LinearRgba::rgb(0.35, 0.18, 0.025),
+            perceptual_roughness: 0.32,
+            reflectance: 0.35,
             ..default()
         })),
         Transform::from_xyz(result.x as f32, result.y as f32, result.z as f32),
         SolutionMarker,
+        SceneContent(ActiveScene::Plane),
     ));
 }
 

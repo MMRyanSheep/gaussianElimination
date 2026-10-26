@@ -3,6 +3,78 @@ use bevy::prelude::*;
 use bevy_egui::{EguiContexts, egui};
 
 use crate::state::{AppliedEquation, DraftEquation, default_equations, equations_to_srting};
+use crate::visualization::{
+    cube::{CubeAnimation, MAX_SCALE, MIN_SCALE},
+    scene::ActiveScene,
+};
+
+pub fn scene_ui_system(
+    mut contexts: EguiContexts,
+    mut active: ResMut<ActiveScene>,
+    mut animation: ResMut<CubeAnimation>,
+) -> Result {
+    let ctx = contexts.ctx_mut()?;
+    let mut viewport_ui = egui::Ui::new(
+        ctx.clone(),
+        "scene_viewport".into(),
+        egui::UiBuilder::new()
+            .layer_id(egui::LayerId::background())
+            .max_rect(ctx.viewport_rect()),
+    );
+    egui::Panel::top("scene_navigation").show(&mut viewport_ui, |ui| {
+        ui.horizontal(|ui| {
+            ui.strong("Linear3D");
+            ui.separator();
+            ui.selectable_value(&mut *active, ActiveScene::Plane, "Plane");
+            ui.selectable_value(&mut *active, ActiveScene::Cube, "Cube");
+        });
+    });
+
+    if *active == ActiveScene::Cube {
+        egui::Window::new("Cube")
+            .default_width(300.0)
+            .resizable(false)
+            .show(ctx, |ui| {
+                ui.heading("motion");
+                ui.label("A cube.");
+                ui.separator();
+                ui.horizontal(|ui| {
+                    let label = if animation.playing { "Pause" } else { "Play" };
+                    if ui.button(label).clicked() {
+                        animation.playing = !animation.playing;
+                    }
+                    if ui.button("Reset").clicked() {
+                        *animation = CubeAnimation::default();
+                    }
+                    ui.label(if animation.playing {
+                        "Animating"
+                    } else {
+                        "Paused"
+                    });
+                });
+                ui.add(egui::Slider::new(&mut animation.speed, 0.2..=3.0).text("Speed"));
+                let mut scale = animation.scale;
+                if ui
+                    .add(egui::Slider::new(&mut scale, MIN_SCALE..=MAX_SCALE).text("Scale"))
+                    .changed()
+                {
+                    animation.set_scale(scale);
+                }
+                ui.small("Adjust scale to pause and inspect the cube.");
+                ui.separator();
+                ui.label(format!("Side length: {:.2}", animation.scale));
+                ui.label(format!("Volume: {:.2}", animation.scale.powi(3)));
+                ui.horizontal(|ui| {
+                    ui.label("Axes:");
+                    ui.colored_label(egui::Color32::from_rgb(242, 77, 89), "X");
+                    ui.colored_label(egui::Color32::from_rgb(89, 217, 128), "Y");
+                    ui.colored_label(egui::Color32::from_rgb(89, 128, 255), "Z");
+                });
+                ui.small("Drag the scene to orbit. Scroll to zoom.");
+            });
+    }
+    Ok(())
+}
 
 pub fn equation_ui_system(
     mut contexts: EguiContexts,

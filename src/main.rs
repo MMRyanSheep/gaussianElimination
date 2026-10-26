@@ -19,18 +19,29 @@ fn main() {
         .init_resource::<DraftEquation>()
         .init_resource::<CalculationState>()
         .init_resource::<StepState>()
+        .init_resource::<visualization::scene::ActiveScene>()
+        .init_resource::<visualization::cube::CubeAnimation>()
         .add_systems(Startup, visualization::scene::setup_scene)
         .add_systems(
             Update,
             (
-                visualization::plane::move_plane,
+                visualization::plane::move_plane.run_if(visualization::scene::plane_is_active),
                 visualization::camera::camera_control,
+                visualization::cube::animate_cube,
             ),
         )
         .add_systems(
             Update,
             (update_result, update_plane, update_solution_marker).chain(),
         )
-        .add_systems(EguiPrimaryContextPass, equation_ui_system)
+        .add_systems(Update, visualization::scene::sync_scene_visibility)
+        .add_systems(
+            EguiPrimaryContextPass,
+            (
+                ui::scene_ui_system,
+                equation_ui_system.run_if(visualization::scene::plane_is_active),
+            )
+                .chain(),
+        )
         .run();
 }
