@@ -1,6 +1,5 @@
 use crate::state::LinearEquation;
 use bevy::prelude::*;
-use bevy::prelude::*;
 use bevy_egui::{EguiContexts, egui};
 
 use crate::state::{AppliedEquation, DraftEquation, default_equations, equations_to_srting};

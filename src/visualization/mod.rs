@@ -10,7 +10,7 @@ use camera::{OrbitCamera, camera_transform_update};
 
 use crate::math::carmer::solver;
 use crate::math::determinant::{det3, equation_to_matrix};
-use crate::state::{AppliedEquation, EquationSet};
+use crate::state::AppliedEquation;
 
 pub fn setup_scene(
     mut commands: Commands,

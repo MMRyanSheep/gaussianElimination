@@ -1,7 +1,4 @@
-use crate::{
-    math::determinant::det3,
-    state::{AppliedEquation, CalculationState, StepState},
-};
+use crate::math::determinant::det3;
 
 #[derive(Debug, Clone, Copy)]
 pub struct CramerSolution {
@@ -21,7 +18,7 @@ fn replace_column(mut matrix: [[f64; 3]; 3], rhs: [f64; 3], col: usize) -> [[f64
     return matrix;
 }
 
-pub fn solver(mut matrix: [[f64; 3]; 3], rhs: [f64; 3], d: f64) -> CramerSolution {
+pub fn solver(matrix: [[f64; 3]; 3], rhs: [f64; 3], d: f64) -> CramerSolution {
     let dx = det3(replace_column(matrix, rhs, 0));
     let dy = det3(replace_column(matrix, rhs, 1));
     let dz = det3(replace_column(matrix, rhs, 2));

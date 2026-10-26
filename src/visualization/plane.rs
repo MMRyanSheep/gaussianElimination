@@ -46,7 +46,7 @@ pub fn move_plane(
     }
 }
 pub fn update_plane(
-    mut commands: Commands,
+    _commands: Commands,
     equations: Res<AppliedEquation>,
     mut plane: Query<(&PlaneId, &mut Transform)>,
 ) {

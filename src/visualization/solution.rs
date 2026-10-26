@@ -1,4 +1,3 @@
-use std::result;
 
 use bevy::prelude::*;
 
@@ -27,7 +26,7 @@ pub fn spawn_solution(
 }
 
 pub fn update_solution_marker(
-    commands: Commands,
+    _commands: Commands,
     solution: Res<CalculationState>,
     mut query: Query<&mut Transform, With<SolutionMarker>>,
 ) {

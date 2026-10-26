@@ -1,5 +1,4 @@
-use crate::state::{AppliedEquation, EquationSet};
-use bevy::prelude::*;
+use crate::state::AppliedEquation;
 
 pub fn det3(m: [[f64; 3]; 3]) -> f64 {
     // TODO
