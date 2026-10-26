@@ -10,7 +10,7 @@ use visualization::plane::update_plane;
 use visualization::solution::update_solution_marker;
 
 use crate::{state::StepState, ui::equation_ui_system};
-use state::{AppliedEquation, DraftEquation, CalculationState};
+use state::{AppliedEquation, CalculationState, DraftEquation};
 fn main() {
     App::new()
         .add_plugins((DefaultPlugins, PanOrbitCameraPlugin, EguiPlugin::default()))
@@ -19,7 +19,7 @@ fn main() {
         .init_resource::<DraftEquation>()
         .init_resource::<CalculationState>()
         .init_resource::<StepState>()
-        .add_systems(Startup, visualization::setup_scene)
+        .add_systems(Startup, visualization::scene::setup_scene)
         .add_systems(
             Update,
             (

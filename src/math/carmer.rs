@@ -11,18 +11,18 @@ pub struct CramerSolution {
     pub z: f64,
 }
 
-fn replace_column(mut matrix: [[f64; 3]; 3], rhs: [f64; 3], col: usize) -> [[f64; 3]; 3] {
+pub fn replace_column(mut matrix: [[f64; 3]; 3], rhs: [f64; 3], col: usize) -> [[f64; 3]; 3] {
     for row in 0..3 {
         matrix[row][col] = rhs[row];
     }
     return matrix;
 }
 
-pub fn solver(matrix: [[f64; 3]; 3], rhs: [f64; 3], d: f64) -> CramerSolution {
+pub fn solver(matrix: [[f64; 3]; 3], rhs: [f64; 3]) -> CramerSolution {
     let dx = det3(replace_column(matrix, rhs, 0));
     let dy = det3(replace_column(matrix, rhs, 1));
     let dz = det3(replace_column(matrix, rhs, 2));
-
+    let d = det3(matrix);
     let x = dx / d;
     let y = dy / d;
     let z = dz / d;
@@ -41,7 +41,7 @@ pub fn solver(matrix: [[f64; 3]; 3], rhs: [f64; 3], d: f64) -> CramerSolution {
 pub fn max_residual(mat: [[f64; 3]; 3], rhs: [f64; 3], xyz: [f64; 3]) -> f64 {
     let mut max_error = 0.0_f64;
 
-    for row in 1..3 {
+    for row in 0..3 {
         let lhs = mat[row][0] * xyz[0] + mat[row][1] * xyz[1] + mat[row][2] * xyz[2];
 
         let error = (lhs - rhs[row]).abs();

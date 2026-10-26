@@ -1,8 +1,10 @@
+
 use bevy::prelude::*;
 
 use crate::math::{
     carmer::{CramerSolution, solver},
-    determinant::{det3, equation_to_matrix},
+    determinant::equation_to_matrix,
+    steps::{CalculationStep, generate_steps},
 };
 #[derive(Component)]
 pub struct PlaneId(pub usize);
@@ -15,6 +17,7 @@ pub struct CalculationState {
 
 #[derive(Resource, Default)]
 pub struct StepState {
+    pub steps: Vec<CalculationStep>,
     pub current: usize,
 }
 #[derive(Debug, Component, Clone, Copy)]
@@ -129,12 +132,12 @@ pub fn update_result(
     calculation.message = None;
     steps.current = 0;
     let matrix = equation_to_matrix(&applied);
-    let d = det3(matrix);
     let rhs = [
         applied.equations[0].d as f64,
         applied.equations[1].d as f64,
         applied.equations[2].d as f64,
     ];
-    let result = solver(matrix, rhs, d);
+    let result = solver(matrix, rhs);
+    steps.steps = generate_steps(&applied.equations, &result);
     calculation.result = Some(result);
 }
