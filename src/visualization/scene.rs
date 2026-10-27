@@ -2,8 +2,6 @@ use super::camera::{OrbitCamera, camera_transform_update};
 use bevy::prelude::*;
 use bevy_panorbit_camera::*;
 
-use crate::math::carmer::solver;
-use crate::math::determinant::equation_to_matrix;
 use crate::state::AppliedEquation;
 
 #[derive(Resource, Default, Clone, Copy, PartialEq, Eq)]
@@ -18,7 +16,13 @@ pub struct SceneContent(pub ActiveScene);
 
 pub fn sync_scene_visibility(
     active: Res<ActiveScene>,
-    mut content: Query<(&SceneContent, &mut Visibility)>,
+    mut content: Query<
+        (&SceneContent, &mut Visibility),
+        (
+            Without<crate::state::PlaneId>,
+            Without<super::solution::SolutionMarker>,
+        ),
+    >,
 ) {
     for (scene, mut visibility) in &mut content {
         *visibility = if scene.0 == *active {
@@ -87,15 +91,7 @@ pub fn setup_scene(
         ..default()
     });
 
-    //math
-    let matrix = equation_to_matrix(&equations);
-    let rhs = [
-        equations.equations[0].d as f64,
-        equations.equations[1].d as f64,
-        equations.equations[2].d as f64,
-    ];
-    let result = solver(matrix, rhs);
-    super::solution::spawn_solution(&mut commands, &mut mesh, &mut materials, result);
+    super::solution::spawn_solution(&mut commands, &mut mesh, &mut materials);
 
     super::axes::spawn_axes(&mut commands, &mut mesh, &mut materials);
     super::plane::spawn_plane(&mut commands, &mut mesh, &mut materials, equations);

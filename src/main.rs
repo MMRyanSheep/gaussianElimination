@@ -14,7 +14,6 @@ use state::{AppliedEquation, CalculationState, DraftEquation};
 fn main() {
     App::new()
         .add_plugins((DefaultPlugins, PanOrbitCameraPlugin, EguiPlugin::default()))
-        .init_resource::<state::EquationSet>()
         .init_resource::<AppliedEquation>()
         .init_resource::<DraftEquation>()
         .init_resource::<CalculationState>()
@@ -22,17 +21,17 @@ fn main() {
         .init_resource::<visualization::scene::ActiveScene>()
         .init_resource::<visualization::cube::CubeAnimation>()
         .add_systems(Startup, visualization::scene::setup_scene)
+        .add_systems(Update, visualization::camera::camera_control)
         .add_systems(
             Update,
             (
-                visualization::plane::move_plane.run_if(visualization::scene::plane_is_active),
-                visualization::camera::camera_control,
+                update_result,
+                state::advance_animation.run_if(visualization::scene::plane_is_active),
                 visualization::cube::animate_cube,
-            ),
-        )
-        .add_systems(
-            Update,
-            (update_result, update_plane, update_solution_marker).chain(),
+                update_plane,
+                update_solution_marker,
+            )
+                .chain(),
         )
         .add_systems(Update, visualization::scene::sync_scene_visibility)
         .add_systems(

@@ -1,18 +1,27 @@
-# gaussianElimination
+# Linear3D
 
-Algebra II Honors project - using 3D to display how gaussian elimination works.
+Algebra II Honors project — 使用 Bevy 展示三元一次方程的三个平面、克拉默法则的逐步计算和立方体缩放动画。
 
-Run with `cargo run`. Use the top navigation to switch between scenes:
+运行：`cargo run`。发布构建：`cargo build --release`。
 
-- **Plane** (default): edit the three linear equations and apply them to the planes.
-- **Cube**: watch a cyan cube outline smoothly grow and shrink around fixed
-  coordinate axes (X red, Y green, Z blue; arrows point in the positive direction).
-  The cube has twelve edges and no filled faces. Use **Pause / Play**,
-  **Speed**, and **Reset** to control the animation. Drag **Scale** to pause and
-  inspect a specific size; the panel also shows side length and volume.
+顶部导航可切换场景：
 
-Switching scenes preserves equation inputs and cube controls; the cube animation
-pauses while the Plane scene is selected. Drag outside the UI to orbit, and scroll
-to zoom.
+- **Plane**（默认）：输入 12 个系数后点击 **Apply** 更新场景；编辑草稿不会改变当前演示。**Reset** 恢复默认方程。
+- **Cube**：青色立方体线框围绕固定坐标轴平滑缩放，共有 12 条边，没有填充面。X 轴红色、Y 轴绿色、Z 轴蓝色，箭头指向正方向。使用 **Pause / Play**、**Speed**、**Reset** 控制动画；拖动 **Scale** 会暂停，方便查看指定尺寸。面板显示边长和体积。
 
-Validate with `cargo check` and `cargo test`.
+切换场景保留方程输入和动画状态；仅当前场景的动画继续播放。拖动 UI 外的区域可旋转视角，滚轮可缩放。
+
+Plane 场景中的计算演示依次显示 A → D → Ax/Dx → Ay/Dy → Az/Dz → 坐标：
+
+- **Play / Pause**：播放或暂停。行列式的六项乘积依次高亮，每项一秒；高亮同步到矩阵元素。
+- **Previous / Next**：前后切换步骤，同时暂停并重置该步骤的动画进度。
+- **Restart**：回到第一步并暂停；播放结束后点击 **Play** 可重新播放。
+- **Slower / Faster**：调整播放速度，范围为 0.25–4 倍。
+
+替换列以背景色标出；当前乘积以金色高亮，同时显示累计和及最终行列式。最后一步展示 `x=Dx/D`、`y=Dy/D`、`z=Dz/D` 和交点坐标。切换计算步骤不会移动原方程对应的平面。
+
+默认样例的 D、Dx、Dy、Dz 分别为 7、7、14、21，交点为 (1, 2, 3)。三个平面依次为珊瑚红、蓝、绿，金色点表示共同交点。
+
+应用或重置会停止并清空旧播放。无解、无数解或无法安全计算有限交点时，程序继续运行，隐藏旧交点、禁用演示；仍可修改方程或操作相机。零法向量对应的平面隐藏，恢复有效方程后重新显示。
+
+检查：`cargo check` 和 `cargo test`。

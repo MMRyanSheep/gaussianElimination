@@ -82,9 +82,9 @@ pub fn generate_steps(
 ) -> Vec<CalculationStep> {
     let (matrix, rhs) = equation_matrix(equations);
 
-    let _ax = replace_column(matrix, rhs, 0);
-    let _ay = replace_column(matrix, rhs, 1);
-    let _az = replace_column(matrix, rhs, 2);
+    let ax = replace_column(matrix, rhs, 0);
+    let ay = replace_column(matrix, rhs, 1);
+    let az = replace_column(matrix, rhs, 2);
     let mut steps = Vec::with_capacity(6);
 
     steps.push(CalculationStep::ShowMatrix { matrix, rhs });
@@ -99,25 +99,25 @@ pub fn generate_steps(
 
     steps.push(CalculationStep::Determinant {
         name: "Dx",
-        matrix,
+        matrix: ax,
         replaced_col: Some(0),
-        products: determinant_products(matrix),
-        result: solution.d,
+        products: determinant_products(ax),
+        result: solution.dx,
     });
     steps.push(CalculationStep::Determinant {
         name: "Dy",
-        matrix,
+        matrix: ay,
         replaced_col: Some(1),
-        products: determinant_products(matrix),
-        result: solution.d,
+        products: determinant_products(ay),
+        result: solution.dy,
     });
 
     steps.push(CalculationStep::Determinant {
         name: "Dz",
-        matrix,
+        matrix: az,
         replaced_col: Some(2),
-        products: determinant_products(matrix),
-        result: solution.d,
+        products: determinant_products(az),
+        result: solution.dz,
     });
 
     steps.push(CalculationStep::Solution {
