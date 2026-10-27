@@ -1,3 +1,4 @@
+mod animation;
 use crate::state::LinearEquation;
 use bevy::prelude::*;
 use bevy_egui::{EguiContexts, egui};
@@ -8,9 +9,11 @@ pub fn equation_ui_system(
     mut contexts: EguiContexts,
     mut draft: ResMut<DraftEquation>,
     mut applied: ResMut<AppliedEquation>,
+    mut steps: ResMut<crate::state::StepState>,
 ) -> Result {
     egui::Window::new("Equation Input")
         .default_width(420.0)
+        .vscroll(true)
         .show(contexts.ctx_mut()?, |ui| {
             ui.heading("3 Linear Equations");
 
@@ -47,6 +50,8 @@ pub fn equation_ui_system(
                 if ui.button("Apply").clicked() {
                     match parse_equation(&draft.values) {
                         Ok(equations) => {
+                            steps.steps.clear();
+                            steps.restart();
                             applied.equations = equations;
                             draft.error = None;
                         }
@@ -57,6 +62,8 @@ pub fn equation_ui_system(
                 }
 
                 if ui.button("Reset").clicked() {
+                    steps.steps.clear();
+                    steps.restart();
                     applied.equations = default_equations();
                     draft.values = equations_to_srting(&applied.equations);
                     draft.error = None;
@@ -73,6 +80,9 @@ pub fn equation_ui_system(
             for e in &applied.equations {
                 ui.label(format!("({})x + ({})y + ({})z = {}", e.a, e.b, e.c, e.d));
             }
+
+            ui.separator();
+            animation::show_animation(ui, &mut steps);
         });
 
     Ok(())

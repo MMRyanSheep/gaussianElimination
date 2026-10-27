@@ -11,6 +11,14 @@ pub struct CramerSolution {
     pub z: f64,
 }
 
+impl CramerSolution {
+    pub fn can_animate(&self) -> bool {
+        [self.x, self.y, self.z]
+            .iter()
+            .all(|v| v.is_finite() && (*v as f32).is_finite())
+    }
+}
+
 pub fn replace_column(mut matrix: [[f64; 3]; 3], rhs: [f64; 3], col: usize) -> [[f64; 3]; 3] {
     for row in 0..3 {
         matrix[row][col] = rhs[row];
@@ -23,9 +31,27 @@ pub fn solver(matrix: [[f64; 3]; 3], rhs: [f64; 3]) -> CramerSolution {
     let dy = det3(replace_column(matrix, rhs, 1));
     let dz = det3(replace_column(matrix, rhs, 2));
     let d = det3(matrix);
-    let x = dx / d;
-    let y = dy / d;
-    let z = dz / d;
+    // Use a row-scaled determinant only to gate playback, without classifying
+    // singular systems. Never divide by a zero or numerically singular D.
+    let mut normalized = matrix;
+    let mut usable = rhs.iter().all(|v| v.is_finite());
+    for row in &mut normalized {
+        let scale = row.iter().fold(0.0_f64, |s, v| s.max(v.abs()));
+        if !scale.is_finite() || scale == 0.0 {
+            usable = false;
+            break;
+        }
+        for value in row {
+            *value /= scale;
+        }
+    }
+    usable &= det3(normalized).abs() > 1e-10;
+    usable &= [d, dx, dy, dz].iter().all(|v| v.is_finite()) && d != 0.0;
+    let [x, y, z] = if usable {
+        [dx / d, dy / d, dz / d]
+    } else {
+        [f64::NAN; 3]
+    };
 
     return CramerSolution {
         d,

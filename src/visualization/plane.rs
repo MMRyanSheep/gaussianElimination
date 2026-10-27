@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::state::{AppliedEquation, EquationSet, LinearEquation, PlaneId};
+use crate::state::{AppliedEquation, LinearEquation, PlaneId};
 
 pub fn equation_to_transform(eq: &LinearEquation) -> Option<Transform> {
     let normal = Vec3::new(eq.a, eq.b, eq.c);
@@ -23,42 +23,22 @@ pub fn equation_to_transform(eq: &LinearEquation) -> Option<Transform> {
     })
 }
 
-pub fn move_plane(
-    mut equations: ResMut<EquationSet>,
-    key: Res<ButtonInput<KeyCode>>,
-    mut query: Query<(&PlaneId, &mut Transform)>,
-) {
-    if !key.just_pressed(KeyCode::Space) {
-        return;
-    }
-    let eq = &mut equations.equations[1];
-
-    eq.d = if eq.d == 3.0 { 5.0 } else { 3.0 };
-    for (id, mut trans) in &mut query {
-        if id.0 != 1 {
-            continue;
-        }
-
-        if let Some(new_trans) = equation_to_transform(eq) {
-            *trans = new_trans;
-            //println!("done");
-        }
-    }
-}
 pub fn update_plane(
-    _commands: Commands,
     equations: Res<AppliedEquation>,
-    mut plane: Query<(&PlaneId, &mut Transform)>,
+    mut plane: Query<(&PlaneId, &mut Transform, &mut Visibility)>,
 ) {
     if !equations.is_changed() {
         return;
     }
-    for (id, mut transform) in &mut plane {
+    for (id, mut transform, mut visibility) in &mut plane {
         let equation = equations.equations[id.0];
 
         match equation_to_transform(&equation) {
-            Some(new_transform) => *transform = new_transform,
-            None => {}
+            Some(new_transform) => {
+                *transform = new_transform;
+                *visibility = Visibility::Visible;
+            }
+            None => *visibility = Visibility::Hidden,
         }
     }
 }

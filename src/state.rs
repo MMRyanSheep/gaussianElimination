@@ -1,4 +1,3 @@
-
 use bevy::prelude::*;
 
 use crate::math::{
@@ -12,13 +11,72 @@ pub struct PlaneId(pub usize);
 #[derive(Resource, Default)]
 pub struct CalculationState {
     pub result: Option<CramerSolution>,
-    pub message: Option<String>,
 }
 
-#[derive(Resource, Default)]
+#[derive(Resource)]
 pub struct StepState {
     pub steps: Vec<CalculationStep>,
     pub current: usize,
+    pub playing: bool,
+    pub elapsed: f32,
+    pub speed: f32,
+}
+
+impl Default for StepState {
+    fn default() -> Self {
+        Self {
+            steps: Vec::new(),
+            current: 0,
+            playing: false,
+            elapsed: 0.0,
+            speed: 1.0,
+        }
+    }
+}
+
+impl StepState {
+    pub fn restart(&mut self) {
+        self.current = 0;
+        self.playing = false;
+        self.elapsed = 0.0;
+    }
+
+    pub fn select(&mut self, index: usize) {
+        if self.steps.is_empty() {
+            return;
+        }
+        self.current = index.min(self.steps.len() - 1);
+        self.elapsed = 0.0;
+        self.playing = false;
+    }
+
+    pub fn duration(&self) -> f32 {
+        match self.steps.get(self.current) {
+            Some(CalculationStep::Determinant { .. }) => 6.0,
+            _ => 2.0,
+        }
+    }
+
+    pub fn active_product(&self) -> usize {
+        (self.elapsed.floor() as usize).min(5)
+    }
+}
+
+pub fn advance_animation(time: Res<Time>, mut steps: ResMut<StepState>) {
+    if !steps.playing || steps.steps.is_empty() {
+        return;
+    }
+    steps.elapsed += time.delta_secs() * steps.speed;
+    while steps.elapsed >= steps.duration() {
+        let duration = steps.duration();
+        if steps.current + 1 == steps.steps.len() {
+            steps.elapsed = duration;
+            steps.playing = false;
+            break;
+        }
+        steps.elapsed -= duration;
+        steps.current += 1;
+    }
 }
 #[derive(Debug, Component, Clone, Copy)]
 pub struct LinearEquation {
@@ -36,10 +94,6 @@ pub struct DraftEquation {
 
 #[derive(Resource)]
 pub struct AppliedEquation {
-    pub equations: [LinearEquation; 3],
-}
-#[derive(Resource)]
-pub struct EquationSet {
     pub equations: [LinearEquation; 3],
 }
 pub fn default_equations() -> [LinearEquation; 3] {
@@ -93,32 +147,6 @@ impl Default for DraftEquation {
         }
     }
 }
-impl Default for EquationSet {
-    fn default() -> Self {
-        Self {
-            equations: [
-                LinearEquation {
-                    a: 1.0,
-                    b: 0.0,
-                    c: 0.0,
-                    d: 1.0,
-                },
-                LinearEquation {
-                    a: 0.0,
-                    b: 1.0,
-                    c: 0.0,
-                    d: 2.0,
-                },
-                LinearEquation {
-                    a: 0.0,
-                    b: 0.0,
-                    c: 1.0,
-                    d: 3.0,
-                },
-            ],
-        }
-    }
-}
 
 pub fn update_result(
     applied: Res<AppliedEquation>,
@@ -129,8 +157,7 @@ pub fn update_result(
         return;
     }
     calculation.result = None;
-    calculation.message = None;
-    steps.current = 0;
+    steps.restart();
     let matrix = equation_to_matrix(&applied);
     let rhs = [
         applied.equations[0].d as f64,
@@ -138,6 +165,10 @@ pub fn update_result(
         applied.equations[2].d as f64,
     ];
     let result = solver(matrix, rhs);
-    steps.steps = generate_steps(&applied.equations, &result);
+    steps.steps = if result.can_animate() {
+        generate_steps(&applied.equations, &result)
+    } else {
+        Vec::new()
+    };
     calculation.result = Some(result);
 }

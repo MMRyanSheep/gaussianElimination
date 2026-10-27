@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 
-use crate::math::carmer::CramerSolution;
 use crate::state::CalculationState;
 
 #[derive(Component)]
@@ -10,7 +9,6 @@ pub fn spawn_solution(
     commands: &mut Commands,
     mesh: &mut Assets<Mesh>,
     materials: &mut Assets<StandardMaterial>,
-    result: CramerSolution,
 ) {
     commands.spawn((
         Mesh3d(mesh.add(Sphere::new(0.15))),
@@ -19,23 +17,24 @@ pub fn spawn_solution(
             unlit: true,
             ..default()
         })),
-        Transform::from_xyz(result.x as f32, result.y as f32, result.z as f32),
+        Transform::default(),
+        Visibility::Hidden,
         SolutionMarker,
     ));
 }
 
 pub fn update_solution_marker(
-    _commands: Commands,
     solution: Res<CalculationState>,
-    mut query: Query<&mut Transform, With<SolutionMarker>>,
+    mut query: Query<(&mut Transform, &mut Visibility), With<SolutionMarker>>,
 ) {
-    for mut transform in &mut query {
+    for (mut transform, mut visibility) in &mut query {
         match &solution.result {
-            Some(result) => {
+            Some(result) if result.can_animate() => {
+                *visibility = Visibility::Visible;
                 transform.translation =
                     Vec3::new(result.x as f32, result.y as f32, result.z as f32);
             }
-            None => {}
+            _ => *visibility = Visibility::Hidden,
         }
     }
 }
