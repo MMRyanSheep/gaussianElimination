@@ -4,3 +4,4 @@ pub mod cube;
 pub mod plane;
 pub mod scene;
 pub mod solution;
+pub mod volume;

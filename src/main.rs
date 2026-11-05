@@ -20,6 +20,7 @@ fn main() {
         .init_resource::<StepState>()
         .init_resource::<visualization::scene::ActiveScene>()
         .init_resource::<visualization::cube::CubeAnimation>()
+        .init_resource::<visualization::volume::VolumeSceneState>()
         .add_systems(Startup, visualization::scene::setup_scene)
         .add_systems(Update, visualization::camera::camera_control)
         .add_systems(
@@ -30,6 +31,9 @@ fn main() {
                 visualization::cube::animate_cube,
                 update_plane,
                 update_solution_marker,
+                visualization::volume::advance_volume_animation,
+                visualization::volume::sync_volume_scene,
+                visualization::volume::update_volume_scene,
             )
                 .chain(),
         )

@@ -1,18 +1,25 @@
 mod animation;
+mod volume;
 use crate::state::LinearEquation;
 use bevy::prelude::*;
 use bevy_egui::{EguiContexts, egui};
 
-use crate::state::{AppliedEquation, DraftEquation, default_equations, equations_to_srting};
+use crate::state::{
+    AppliedEquation, CalculationState, DraftEquation, default_equations, equations_to_srting,
+};
 use crate::visualization::{
     cube::{CubeAnimation, MAX_SCALE, MIN_SCALE},
     scene::ActiveScene,
+    volume::VolumeSceneState,
 };
 
 pub fn scene_ui_system(
     mut contexts: EguiContexts,
     mut active: ResMut<ActiveScene>,
     mut animation: ResMut<CubeAnimation>,
+    mut volume: ResMut<VolumeSceneState>,
+    applied: Res<AppliedEquation>,
+    calculation: Res<CalculationState>,
 ) -> Result {
     let ctx = contexts.ctx_mut()?;
     let mut viewport_ui = egui::Ui::new(
@@ -28,6 +35,7 @@ pub fn scene_ui_system(
             ui.separator();
             ui.selectable_value(&mut *active, ActiveScene::Plane, "Plane");
             ui.selectable_value(&mut *active, ActiveScene::Cube, "Cube");
+            ui.selectable_value(&mut *active, ActiveScene::Volume, "体积变换");
         });
     });
 
@@ -72,6 +80,15 @@ pub fn scene_ui_system(
                     ui.colored_label(egui::Color32::from_rgb(89, 128, 255), "Z");
                 });
                 ui.small("Drag the scene to orbit. Scroll to zoom.");
+            });
+    }
+
+    if *active == ActiveScene::Volume {
+        egui::Window::new("Volume")
+            .default_width(330.0)
+            .resizable(false)
+            .show(ctx, |ui| {
+                volume::show_panel(ui, &mut volume, &applied, calculation.result.as_ref());
             });
     }
     Ok(())

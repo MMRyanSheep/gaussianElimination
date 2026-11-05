@@ -9,6 +9,9 @@ pub enum ActiveScene {
     #[default]
     Plane,
     Cube,
+    /// Cramer's rule shown as a volume ratio; spawned on demand by
+    /// [`super::volume`].
+    Volume,
 }
 
 #[derive(Component)]
@@ -54,7 +57,12 @@ mod tests {
             .world_mut()
             .spawn((SceneContent(ActiveScene::Cube), Visibility::Hidden))
             .id();
-        for active in [ActiveScene::Plane, ActiveScene::Cube, ActiveScene::Plane] {
+        for active in [
+            ActiveScene::Plane,
+            ActiveScene::Cube,
+            ActiveScene::Volume,
+            ActiveScene::Plane,
+        ] {
             *app.world_mut().resource_mut::<ActiveScene>() = active;
             app.update();
             assert_eq!(
