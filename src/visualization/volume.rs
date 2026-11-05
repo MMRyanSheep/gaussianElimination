@@ -105,8 +105,8 @@ pub enum AnimationStage {
 impl AnimationStage {
     pub fn label(self) -> &'static str {
         match self {
-            AnimationStage::Scale => "缩放",
-            AnimationStage::Shear => "剪切",
+            AnimationStage::Scale => "Scale",
+            AnimationStage::Shear => "Shear",
         }
     }
 }

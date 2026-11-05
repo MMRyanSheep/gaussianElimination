@@ -35,7 +35,7 @@ pub fn scene_ui_system(
             ui.separator();
             ui.selectable_value(&mut *active, ActiveScene::Plane, "Plane");
             ui.selectable_value(&mut *active, ActiveScene::Cube, "Cube");
-            ui.selectable_value(&mut *active, ActiveScene::Volume, "体积变换");
+            ui.selectable_value(&mut *active, ActiveScene::Volume, "Volume");
         });
     });
 

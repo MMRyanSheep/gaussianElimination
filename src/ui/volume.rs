@@ -28,16 +28,16 @@ pub fn show_panel(
     };
 
     if !result.can_animate() {
-        ui.colored_label(NEGATIVE, "矩阵奇异，无唯一解");
+        ui.colored_label(NEGATIVE, "Singular matrix: no unique solution");
         ui.small("The parallelepipeds stay hidden while det(A) is zero.");
         return;
     }
 
     ui.horizontal(|ui| {
-        ui.label("替换列:");
+        ui.label("Replace column:");
         for column in 0..3 {
             let selected = state.column == column;
-            let label = format!("第 {} 列 a{}", column + 1, column + 1);
+            let label = format!("Column {} a{}", column + 1, column + 1);
             if ui.radio(selected, label).clicked() && !selected {
                 state.select_column(column);
             }
@@ -55,7 +55,7 @@ pub fn show_panel(
         if ui.button("Reset").clicked() {
             state.restart();
         }
-        ui.label(format!("阶段: {}", stage_at(state.t).label()));
+        ui.label(format!("Stage: {}", stage_at(state.t).label()));
     });
 
     let mut t = state.t;
@@ -99,7 +99,7 @@ pub fn show_panel(
     };
     ui.colored_label(
         color,
-        format!("{mark} V{name} / V0 = x{name}  (误差 {error:.1e})"),
+        format!("{mark} V{name} / V0 = x{name}  (error {error:.1e})"),
     );
 
     ui.separator();
