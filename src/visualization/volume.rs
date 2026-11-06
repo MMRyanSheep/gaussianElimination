@@ -1,11 +1,3 @@
-//! Cramer's rule as a volume ratio: replacing column `i` of A by `b` scales the
-//! parallelepiped volume by exactly `x_i`.
-//!
-//! Animation path for the replaced column `a_i`:
-//! 1. `t in [0, 0.5]`: `a_i` is stretched by `x_i` (volume scales by `x_i`).
-//! 2. `t in [0.5, 1]`: `x_i * a_i` is sheared to `b`, which only slides it inside
-//!    the span of the two untouched columns, so the volume does not change.
-
 use bevy::asset::RenderAssetUsages;
 use bevy::math::DVec3;
 use bevy::mesh::{Indices, PrimitiveTopology};
@@ -83,16 +75,12 @@ impl VolumeSceneState {
     }
 }
 
-/// Marker for everything that belongs to this scene; the whole scene is spawned
-/// on entry and despawned on exit through this component.
 #[derive(Component)]
 pub struct VolumeSceneMarker;
 
 #[derive(Component, Clone, Copy, PartialEq, Eq)]
 pub enum VolumeBody {
-    /// `P(a1, a2, a3)`, the fixed reference body.
     Reference,
-    /// `P(...b, ...)`, the body that follows the animation.
     Transformed,
 }
 
@@ -119,13 +107,11 @@ pub fn stage_at(t: f32) -> AnimationStage {
     }
 }
 
-/// Smoothstep easing in `[0, 1]`; both animation stages use it independently.
 pub fn smoothstep(progress: f32) -> f32 {
     let p = progress.clamp(0.0, 1.0);
     p * p * (3.0 - 2.0 * p)
 }
 
-/// Eased progress inside the current stage, so `t = 0.5` restarts at zero.
 pub fn eased_stage_progress(t: f32) -> f32 {
     if t < 0.5 {
         smoothstep(t * 2.0)
@@ -134,11 +120,6 @@ pub fn eased_stage_progress(t: f32) -> f32 {
     }
 }
 
-/// The replaced column at time `t`: `a_i -> x_i * a_i -> b`.
-///
-/// The second half is a plain lerp, which is exactly the shear
-/// `x_i * a_i + s * (x_j * a_j + x_k * a_k)` because `b - x_i * a_i` lies in the
-/// span of the two untouched columns.
 pub fn replaced_vector(column: DVec3, target: DVec3, xi: f64, t: f32) -> DVec3 {
     let eased = eased_stage_progress(t) as f64;
     let scaled = column * xi;
@@ -149,7 +130,6 @@ pub fn replaced_vector(column: DVec3, target: DVec3, xi: f64, t: f32) -> DVec3 {
     }
 }
 
-/// Signed volume of the parallelepiped spanned by three ordered vectors.
 pub fn triple_product(first: DVec3, second: DVec3, third: DVec3) -> f64 {
     first.cross(second).dot(third)
 }
@@ -189,12 +169,10 @@ pub fn current_columns(
     current
 }
 
-/// `V(t) = (u x v) . w`, always recomputed from the live vectors.
 pub fn volume_at(columns: [DVec3; 3], target: DVec3, x: [f64; 3], column: usize, t: f32) -> f64 {
     signed_volume(current_columns(columns, target, x, column, t))
 }
 
-/// The eight corners, with `index` acting as a bit mask over the three vectors.
 pub fn body_vertices(vectors: [DVec3; 3]) -> [Vec3; 8] {
     std::array::from_fn(|index| {
         let mut corner = DVec3::ZERO;
@@ -243,7 +221,7 @@ fn new_body_mesh(vertices: &[Vec3; 8]) -> Mesh {
         RenderAssetUsages::default(),
     );
     write_body_mesh(&mut mesh, vertices);
-    // 6 quads -> 12 triangles; duplicated corners keep the faces crisp.
+
     let indices: Vec<u32> = (0..6)
         .flat_map(|face| {
             let base = (face * 4) as u32;
@@ -254,7 +232,6 @@ fn new_body_mesh(vertices: &[Vec3; 8]) -> Mesh {
     mesh
 }
 
-/// Rewrites positions and normals in place; the index buffer never changes.
 fn write_body_mesh(mesh: &mut Mesh, vertices: &[Vec3; 8]) {
     let mut positions = Vec::with_capacity(24);
     let mut normals = Vec::with_capacity(24);
@@ -282,12 +259,6 @@ pub fn advance_volume_animation(
     }
 }
 
-/// Spawns the scene when it becomes active and despawns it (with its assets)
-/// when another scene is selected.
-///
-/// The existing `PanOrbitCamera` (radius 30, target at the origin) already frames
-/// the plane scene, whose planes are 10x10; the two bodies here stay inside a
-/// radius of about 7, so no camera parameters have to change.
 #[allow(clippy::too_many_arguments)]
 pub fn sync_volume_scene(
     mut commands: Commands,
@@ -312,7 +283,6 @@ pub fn sync_volume_scene(
         return;
     }
 
-    // Entering the scene always starts from the untouched reference body.
     state.restart();
 
     let columns = column_vectors(equation_to_matrix(&applied));
@@ -334,8 +304,6 @@ pub fn sync_volume_scene(
         Visibility::Hidden
     };
 
-    // Translucent, unlit and double sided: both bodies stay readable through
-    // each other, and face winding never hides a wall.
     let reference_material = materials.add(StandardMaterial {
         base_color: Color::srgba(0.55, 0.66, 0.85, 0.16),
         alpha_mode: AlphaMode::Blend,
@@ -458,7 +426,6 @@ fn draw_overlay(
     gizmos.arrow(Vec3::ZERO, target.as_vec3(), target_color());
     gizmos.arrow(Vec3::ZERO, current[column].as_vec3(), vector_color(column));
 
-    // Remnants of the trajectory: a_i -> x_i * a_i -> b.
     let scaled = (columns[column] * x[column]).as_vec3();
     dashed_line(
         gizmos,
@@ -491,7 +458,6 @@ mod tests {
     use super::*;
     use crate::math::carmer::solver;
 
-    /// Default system: det(A) = 7, x = (1, 2, 3).
     fn reference() -> ([DVec3; 3], DVec3, [f64; 3]) {
         let applied = AppliedEquation::default();
         let matrix = equation_to_matrix(&applied);
@@ -512,7 +478,6 @@ mod tests {
             let expected = x[column] * v0;
             assert!((volume_at(columns, target, x, column, 0.5) - expected).abs() < 1e-12);
             assert!((volume_at(columns, target, x, column, 1.0) - expected).abs() < 1e-12);
-            // P(b, ...) really is the matrix with column `i` replaced by b.
             let mut replaced = equation_to_matrix(&AppliedEquation::default());
             for row in 0..3 {
                 replaced[row][column] = [target.x, target.y, target.z][row];
@@ -539,7 +504,6 @@ mod tests {
         let (columns, target, x) = reference();
         let v0 = signed_volume(columns);
         for column in 0..3 {
-            // Stop before t = 0.5: the stage boundary belongs to the shear phase.
             for step in 0..40 {
                 let t = 0.5 * step as f32 / 40.0;
                 let factor = 1.0 + (x[column] - 1.0) * eased_stage_progress(t) as f64;
@@ -584,14 +548,12 @@ mod tests {
         assert_eq!(scene_entities(&mut app).len(), 2);
         assert_eq!(app.world().resource::<Assets<Mesh>>().len(), 2);
 
-        // Leaving the scene removes the entities *and* their assets.
         *app.world_mut().resource_mut::<ActiveScene>() = ActiveScene::Cube;
         app.update();
         assert!(scene_entities(&mut app).is_empty());
         assert_eq!(app.world().resource::<Assets<Mesh>>().len(), 0);
         assert_eq!(app.world().resource::<Assets<StandardMaterial>>().len(), 0);
 
-        // Re-entering builds a fresh scene instead of reusing stale entities.
         *app.world_mut().resource_mut::<ActiveScene>() = ActiveScene::Volume;
         app.update();
         assert_eq!(scene_entities(&mut app).len(), 2);
@@ -602,12 +564,9 @@ mod tests {
         let (columns, target, x) = reference();
         let vertices = body_vertices(columns);
         assert!(vertices.iter().all(|vertex| vertex.is_finite()));
-        // Corner 0 is the origin, corner 7 is the sum of the three columns.
         assert!(vertices[0].length() < 1e-6);
         let expected = columns[0] + columns[1] + columns[2];
         assert!((vertices[7].as_dvec3() - expected).abs().max_element() < 1e-6);
-
-        // With t = 1 the first corner is b + a2 + a3.
         let replaced = body_vertices(current_columns(columns, target, x, 0, 1.0));
         let expected = target + columns[1] + columns[2];
         assert!((replaced[7].as_dvec3() - expected).abs().max_element() < 1e-6);

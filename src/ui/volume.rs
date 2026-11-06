@@ -19,7 +19,7 @@ pub fn show_panel(
     result: Option<&CramerSolution>,
 ) {
     ui.heading("Cramer volume");
-    ui.label("V_i / V0 = x_i");
+    ui.label("");
     ui.separator();
 
     let Some(result) = result else {
@@ -65,11 +65,7 @@ pub fn show_panel(
     {
         state.set_t(t);
     }
-    ui.small(if state.t < 0.5 {
-        "0 - 0.5: a_i is scaled by x_i"
-    } else {
-        "0.5 - 1: x_i * a_i is sheared onto b (volume unchanged)"
-    });
+    ui.small(if state.t < 0.5 { "" } else { "" });
 
     ui.separator();
 
@@ -109,7 +105,7 @@ pub fn show_panel(
             ui.colored_label(to_color32(color), label);
         }
     });
-    ui.small("Dashed: a_i → x_i·a_i → b. Drag the scene to orbit.");
+    ui.small("");
 
     if state.playing {
         ui.ctx().request_repaint();

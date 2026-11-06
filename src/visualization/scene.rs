@@ -9,8 +9,6 @@ pub enum ActiveScene {
     #[default]
     Plane,
     Cube,
-    /// Cramer's rule shown as a volume ratio; spawned on demand by
-    /// [`super::volume`].
     Volume,
 }
 
